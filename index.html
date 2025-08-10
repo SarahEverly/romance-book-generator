@@ -21,6 +21,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
+        // Core React and Lucide libraries are loaded globally
         const { useState } = React;
         const { Heart, Upload } = lucide;
 
@@ -174,7 +175,9 @@
           );
         }
 
-        ReactDOM.render(<App />, document.getElementById('root'));
+        document.addEventListener('DOMContentLoaded', () => {
+            ReactDOM.render(<App />, document.getElementById('root'));
+        });
     </script>
 </body>
 </html>
