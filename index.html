@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kindle Unlimited Romance Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;900&display=swap');
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { Heart, Upload } = lucide;
+
+        // Main App component
+        function App() {
+          const [books, setBooks] = useState([]);
+          const [currentBook, setCurrentBook] = useState(null);
+          const [loading, setLoading] = useState(false);
+          const [error, setError] = useState(null);
+
+          // Handle file upload and parse CSV data
+          const handleFileUpload = (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+              return;
+            }
+
+            setLoading(true);
+            setError(null);
+            setBooks([]);
+            setCurrentBook(null);
+
+            Papa.parse(file, {
+              header: true,
+              skipEmptyLines: true,
+              dynamicTyping: true,
+              complete: (results) => {
+                if (results.errors.length > 0) {
+                  console.error("CSV Parsing Errors:", results.errors);
+                  setError("Failed to parse the CSV file. Please check the format.");
+                  setLoading(false);
+                  return;
+                }
+
+                const formattedBooks = results.data.map(book => ({
+                  ...book,
+                  // Ensure tropes are parsed into an array
+                  tropes: book.tropes ? String(book.tropes).split(',').map(t => t.trim()) : [],
+                  // Ensure affiliateLink is correctly included
+                  affiliateLink: book.affiliateLink || "https://www.amazon.com/kindle-dbs/hz/subscribe/ku/?ref_=dbs_f_kud_kd_ku_sub_romance_dbs_romance_p"
+                }));
+
+                setBooks(formattedBooks);
+                if (formattedBooks.length > 0) {
+                  setCurrentBook(formattedBooks[0]);
+                }
+                setLoading(false);
+              },
+              error: (err) => {
+                console.error("CSV Parsing Error:", err);
+                setError("An error occurred while parsing the CSV file.");
+                setLoading(false);
+              },
+            });
+          };
+
+          // Select a new random book from the list
+          const generateNewBook = () => {
+            if (books.length === 0) {
+              return;
+            }
+            const randomIndex = Math.floor(Math.random() * books.length);
+            setCurrentBook(books[randomIndex]);
+          };
+          
+          return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 font-inter">
+              <div className="bg-white shadow-xl rounded-2xl p-8 max-w-xl w-full text-center transform transition-all duration-300">
+                <h1 className="text-4xl font-bold text-pink-600 mb-6 flex items-center justify-center">
+                  <Heart className="mr-2" size={36} /> Romance Book List
+                </h1>
+
+                {/* File Upload Section */}
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 mb-8 hover:border-pink-400 transition-colors duration-200">
+                  <label htmlFor="csv-upload" className="cursor-pointer">
+                    <div className="flex flex-col items-center justify-center text-gray-500">
+                      <Upload size={48} className="mb-2" />
+                      <p className="text-lg font-semibold">Upload your CSV book list</p>
+                      <p className="text-sm">Columns: `title`, `author`, `coverImage`, `tropes`, `affiliateLink`</p>
+                    </div>
+                    <input
+                      id="csv-upload"
+                      type="file"
+                      accept=".csv"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                  </label>
+                </div>
+
+                {loading && (
+                  <div className="mt-6 text-pink-500 font-medium">Loading books...</div>
+                )}
+                
+                {error && (
+                  <div className="mt-6 text-red-500 font-medium">{error}</div>
+                )}
+
+                {/* Display the current book */}
+                {currentBook && (
+                  <div className="space-y-6">
+                    <div className="relative w-48 h-72 mx-auto rounded-lg shadow-lg overflow-hidden">
+                      <img
+                        src={currentBook.coverImage}
+                        alt={`${currentBook.title} book cover`}
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      />
+                    </div>
+                    <div>
+                      <h2 className="text-3xl font-extrabold text-gray-900 leading-tight">{currentBook.title}</h2>
+                      <p className="text-xl text-gray-600 mt-1 font-medium italic">by {currentBook.author}</p>
+                    </div>
+                    <div className="text-left bg-pink-50 p-4 rounded-lg shadow-inner">
+                      <h3 className="text-lg font-bold text-pink-700 mb-2">Tropes:</h3>
+                      <ul className="list-disc list-inside text-gray-700">
+                        {currentBook.tropes.map((trope, index) => (
+                          <li key={index}>{trope}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <a
+                      href={currentBook.affiliateLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block w-full py-3 px-6 rounded-full font-semibold text-lg
+                        bg-pink-700 text-white shadow-lg transition-all duration-300
+                        hover:bg-pink-800 hover:shadow-xl transform hover:-translate-y-1"
+                    >
+                      Read/Purchase on Kindle Unlimited
+                    </a>
+                  </div>
+                )}
+
+                {/* The generate button is now at the bottom of the page */}
+                {books.length > 0 && (
+                  <div className="mt-8">
+                    <button
+                      onClick={generateNewBook}
+                      className={`
+                        w-full py-3 px-6 rounded-full font-semibold text-lg
+                        transition-all duration-300
+                        bg-pink-500 text-white shadow-lg hover:bg-pink-600 hover:shadow-xl transform hover:-translate-y-1
+                      `}
+                    >
+                      Get a New Recommendation
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
