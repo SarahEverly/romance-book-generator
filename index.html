@@ -11,18 +11,37 @@
       body {
         font-family: 'Inter', sans-serif;
       }
+      /* Animation for the scrolling banner */
+      .scrolling-text-container {
+        white-space: nowrap;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+      .scrolling-text-content {
+        display: inline-block;
+        padding-left: 100%;
+        animation: scroll-left 15s linear infinite;
+      }
+      @keyframes scroll-left {
+        0% {
+          transform: translateX(0%);
+        }
+        100% {
+          transform: translateX(-100%);
+        }
+      }
     </style>
 </head>
 <body class="bg-pink-100 p-4">
-        <div id="app" class="min-h-screen flex items-center justify-center">
-        <div class="bg-white shadow-xl rounded-2xl p-8 max-w-xl w-full text-center transform transition-all duration-300">
-            <!-- Place the banner code here -->
-            <div class="bg-pink-600 text-white rounded-xl p-4 mb-8 shadow-lg">
-                <h3 class="text-lg font-bold">New Romance Releases!</h3>
-                <p class="text-sm mt-1">Check out our latest blog post on the top reads this season. <a href="#" class="underline font-semibold hover:text-pink-200">Read More</a></p>
-            </div>
     <div id="app" class="min-h-screen flex items-center justify-center">
         <div class="bg-white shadow-xl rounded-2xl p-8 max-w-xl w-full text-center transform transition-all duration-300">
+            <!-- Book News Banner (now scrolling and subtle) -->
+            <div class="scrolling-text-container border-b-2 border-pink-200 mb-6 pb-2">
+                <div class="scrolling-text-content text-pink-600 font-semibold text-sm">
+                    ✨ Check out our new releases this season on the blog! Click <a href="#" class="underline">here</a> to read more. ✨
+                </div>
+            </div>
+            
             <h1 class="text-4xl font-bold text-pink-600 mb-6 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart mr-2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                 What Should I Read Next?
@@ -67,9 +86,9 @@
             </div>
         </div>
     </div>
-<p class="text-xs text-gray-500 mt-6">
-  This site contains affiliate links to Amazon. Thank you for supporting the upkeep of this site!
-</p>
+    <p class="text-xs text-gray-500 mt-6">
+      This site contains affiliate links to Amazon. Thank you for supporting the upkeep of this site!
+    </p>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
