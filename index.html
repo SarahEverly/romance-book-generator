@@ -13,14 +13,14 @@
       }
     </style>
 </head>
-<body class="bg-gray-100 p-4">
+<body class="bg-pink-100 p-4">
     <div id="app" class="min-h-screen flex items-center justify-center">
         <div class="bg-white shadow-xl rounded-2xl p-8 max-w-xl w-full text-center transform transition-all duration-300">
             <h1 class="text-4xl font-bold text-pink-600 mb-6 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart mr-2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                 What Should I Read Next?
             </h1>
- <h2 class="text-xl text-gray-700 mb-6">A Random Romance Generator for the Adventurous Kindle Unlimited Reader</h2>
+ <h2 class="text-xl text-gray-700 mb-6">A Random Book Generator for the Adventurous Romance Reader</h2>
 
             <div id="loading-message" class="mt-6 text-pink-500 font-medium">Loading book list...</div>
             <p id="error-message" class="hidden mt-6 text-red-500 font-medium"></p>
@@ -60,6 +60,9 @@
             </div>
         </div>
     </div>
+<p class="text-xs text-gray-500 mt-6">
+  This site contains affiliate links to Amazon. Thank you for supporting the upkeep of this site!
+</p>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
