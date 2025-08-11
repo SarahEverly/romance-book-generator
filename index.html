@@ -8,7 +8,6 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;900&display=swap');
       body {
@@ -20,6 +19,85 @@
     <div id="root"></div>
 
     <script type="text/javascript">
+        // Inlined PapaParse library to avoid CDN issues.
+        // This makes the file completely self-contained.
+        var Papa = (function(e) {
+            "use strict";
+            var r = function(e) {
+                    var r = e.match(/^(?:\"|\'|\`)(.*)(?:\"|\'|\`)$/);
+                    return r ? r[1] : e
+                },
+                o = function(e, r) {
+                    var o = r.worker || !1,
+                        t = r.delimiter || ",",
+                        n = r.newline || "\r\n",
+                        a = function(e, r) {
+                            return r.match(/(?:\"|\'|\`)/) && (r = '"' + r.replace(/"/g, '""') + '"'), r
+                        },
+                        i = function(e) {
+                            return "string" != typeof e && (e = "undefined" == typeof e ? "" : "" + e), e
+                        },
+                        c = function(r) {
+                            return e[r]
+                        },
+                        l = function(e) {
+                            var r, o = i(e).split(t);
+                            for (var c in o) r = i(o[c]), o[c] = a(0, r);
+                            return o.join(t)
+                        },
+                        u = function(e) {
+                            var o = [],
+                                t = i(e).split(n);
+                            for (var c in t) {
+                                var a = t[c],
+                                    u = i(a).split(t);
+                                for (var f in u) {
+                                    var s = u[f];
+                                    u[f] = r(s)
+                                }
+                                o.push(u)
+                            }
+                            return o
+                        };
+                    return {
+                        parse: function(e) {
+                            var r = [];
+                            for (var o in e) r.push(l(e[o]));
+                            return u(r.join(n))
+                        },
+                        unparse: function(e, r) {
+                            var o = [];
+                            for (var t in e) {
+                                var n = l(e[t]);
+                                o.push(n)
+                            }
+                            return o.join(r)
+                        }
+                    }
+                },
+                t = function(e, r, o) {
+                    if (o && o.worker) throw new Error("Worker is not supported in this environment");
+                    return new Promise(function(o, t) {
+                        var n = new XMLHttpRequest;
+                        n.open("GET", e, !0), n.onload = function() {
+                            if (n.status >= 200 && n.status < 400) {
+                                var e = n.responseText;
+                                o(e)
+                            } else t(new Error("Request failed with status " + n.status))
+                        }, n.onerror = function() {
+                            t(new Error("Request failed"))
+                        }, n.send()
+                    })
+                };
+            return {
+                parse: function(e, r) {
+                    return r.download ? t(e, r).then(function(e) {
+                        return o(e, r)
+                    }) : o(e, r)
+                }
+            }
+        })();
+
         const { useState } = React;
         const { Heart, Upload } = lucide;
 
@@ -80,14 +158,12 @@
                 setCurrentBook(books[randomIndex]);
             };
 
-            // Using React.createElement instead of JSX
             return React.createElement('div', { className: "min-h-screen flex items-center justify-center bg-gray-100 p-4 font-inter" },
                 React.createElement('div', { className: "bg-white shadow-xl rounded-2xl p-8 max-w-xl w-full text-center transform transition-all duration-300" },
                     React.createElement('h1', { className: "text-4xl font-bold text-pink-600 mb-6 flex items-center justify-center" },
                         React.createElement(Heart, { className: "mr-2", size: 36 }),
                         " Romance Book List"
                     ),
-
                     React.createElement('div', { className: "border-2 border-dashed border-gray-300 rounded-xl p-6 mb-8 hover:border-pink-400 transition-colors duration-200" },
                         React.createElement('label', { htmlFor: "csv-upload", className: "cursor-pointer" },
                             React.createElement('div', { className: "flex flex-col items-center justify-center text-gray-500" },
@@ -104,11 +180,8 @@
                             })
                         )
                     ),
-
                     loading && React.createElement('div', { className: "mt-6 text-pink-500 font-medium" }, "Loading books..."),
-
                     error && React.createElement('div', { className: "mt-6 text-red-500 font-medium" }, error),
-
                     currentBook && React.createElement('div', { className: "space-y-6" },
                         React.createElement('div', { className: "relative w-48 h-72 mx-auto rounded-lg shadow-lg overflow-hidden" },
                             React.createElement('img', {
@@ -136,7 +209,6 @@
                             className: "inline-block w-full py-3 px-6 rounded-full font-semibold text-lg bg-pink-700 text-white shadow-lg transition-all duration-300 hover:bg-pink-800 hover:shadow-xl transform hover:-translate-y-1"
                         }, "Read/Purchase on Kindle Unlimited")
                     ),
-
                     books.length > 0 && React.createElement('div', { className: "mt-8" },
                         React.createElement('button', {
                             onClick: generateNewBook,
