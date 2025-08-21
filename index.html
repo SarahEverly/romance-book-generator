@@ -40,7 +40,7 @@
         <div class="bg-white shadow-xl rounded-2xl p-8 max-w-xl w-full text-center transform transition-all duration-300">
             <!-- Book News Banner (now scrolling and subtle) -->
             <div class="scrolling-text-container border-b-2 border-pink-200 mb-6 pb-2">
-                <div class="scrolling-text-content text-pink-600 font-semibold text-sm">
+                <div id="event-banner-content" class="scrolling-text-content text-pink-600 font-semibold text-sm">
                     ✨ Upcoming Book-ish Events ✨ <a href="#" class="underline">COMING SOON</a> ✨
                 </div>
             </div>
@@ -49,7 +49,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart mr-2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                 What Should I Read Next?
             </h1>
-            <h2 class="text-xl text-gray-700 mb-6 font-semibold" style="font-family: 'Shadows Into Light', cursive;">The Perfect Romance Recommendation, Every Time</h2>
+            <h2 class="text-xl text-gray-700 mb-6" style="font-family: 'Shadows Into Light', cursive;">The Perfect Romance Recommendation, Every Time</h2>
 
             <div id="loading-message" class="mt-6 text-pink-500 font-medium">Loading book list...</div>
             <p id="error-message" class="hidden mt-6 text-red-500 font-medium"></p>
@@ -92,10 +92,10 @@
     <p class="text-xs text-gray-500 mt-6 text-center">
       This site contains Amazon affiliate links. Thank you for supporting the upkeep of this site!
     </p>
-   <div class="flex justify-center space-x-4 mt-2">
-  <a href="https://forms.gle/9vJz8XKuq84zmMV87" class="text-pink-500 hover:underline" target="_blank" rel="noopener noreferrer">Submit your book</a>
-  <a href="https://forms.gle/onS1JQrJ6usdEAEK9" class="text-pink-500 hover:underline" target="_blank" rel="noopener noreferrer">Submit your event</a>
-</div>
+    <div class="flex justify-center space-x-4 mt-2">
+        <a href="https://forms.gle/9vJz8XKuq84zmMV87" class="text-pink-500 hover:underline" target="_blank" rel="noopener noreferrer">Submit your book</a>
+        <a href="https://forms.gle/onS1JQrJ6usdEAEK9" class="text-pink-500 hover:underline" target="_blank" rel="noopener noreferrer">Submit your event</a>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -104,6 +104,7 @@
             const buttonContainer = document.getElementById('button-container');
             const errorMessage = document.getElementById('error-message');
             const loadingMessage = document.getElementById('loading-message');
+            const eventBannerContent = document.getElementById('event-banner-content');
 
             const bookTitle = document.getElementById('book-title');
             const bookAuthor = document.getElementById('book-author');
@@ -147,10 +148,36 @@
                 }
                 outputDiv.classList.remove('hidden');
             }
+            
+            // Function to handle the event banner data
+            function getUpcomingEvents(events) {
+                const now = new Date();
+                const thirtyDaysFromNow = new Date();
+                thirtyDaysFromNow.setDate(now.getDate() + 30);
 
-            const csvUrl = 'books.csv';
-                
-            Papa.parse(csvUrl, {
+                // Filter for events in the next 30 days
+                return events.filter(event => {
+                    const eventDate = new Date(event.eventDate);
+                    return eventDate >= now && eventDate <= thirtyDaysFromNow;
+                });
+            }
+
+            function displayEventBanner(events) {
+                const upcomingEvents = getUpcomingEvents(events);
+                if (upcomingEvents.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * upcomingEvents.length);
+                    const randomEvent = upcomingEvents[randomIndex];
+                    eventBannerContent.innerHTML = `
+                        ✨ Upcoming Event: <a href="${randomEvent.eventLink}" target="_blank" rel="noopener noreferrer" class="underline">${randomEvent.eventTitle}</a> ✨
+                    `;
+                } else {
+                    eventBannerContent.innerHTML = `<p>✨ Stay tuned for upcoming events! ✨</p>`;
+                }
+            }
+
+
+            // Parse the books.csv file
+            Papa.parse('books.csv', {
                 header: true,
                 download: true,
                 skipEmptyLines: true,
@@ -183,6 +210,26 @@
                     loadingMessage.classList.add('hidden');
                     displayError("An error occurred while fetching the book list. Please make sure 'books.csv' is in your repository.");
                 },
+            });
+
+            // Parse the events.csv file for the banner
+            Papa.parse('events.csv', {
+                header: true,
+                download: true,
+                skipEmptyLines: true,
+                dynamicTyping: true,
+                complete: (results) => {
+                    if (results.errors.length === 0 && results.data.length > 0) {
+                        displayEventBanner(results.data);
+                    } else {
+                        console.warn("Could not load events.csv or file is empty.");
+                        displayEventBanner([]); // Display default message
+                    }
+                },
+                error: (err) => {
+                    console.warn("Error fetching events.csv:", err);
+                    displayEventBanner([]); // Display default message
+                }
             });
 
             generateButton.addEventListener('click', displayRandomBook);
