@@ -41,8 +41,8 @@
             <!-- Book News Banner (now scrolling and subtle) -->
             <div class="scrolling-text-container border-b-2 border-pink-200 mb-6 pb-2">
                 <div id="event-banner-content" class="scrolling-text-content text-pink-600 font-semibold text-sm">
-                    <!-- The event data will be dynamically injected here by the JavaScript -->
-                    ✨ Stay tuned for upcoming events! ✨
+                    <!-- Event data will be injected here by JavaScript -->
+                    <p>✨ Stay tuned for upcoming events! ✨</p>
                 </div>
             </div>
             
@@ -158,9 +158,9 @@
 
                 // Filter for events in the next 30 days
                 const upcoming = events.filter(event => {
-                    // Normalize date string for reliable parsing across browsers
-                    const dateParts = event.eventDate.split('/');
-                    const eventDate = new Date(`${dateParts[2]}-${dateParts[0]}-${dateParts[1]}`);
+                    // Use a more robust date parsing method to handle different formats
+                    const dateParts = event.eventDate.split('-');
+                    const eventDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
                     
                     return eventDate >= now && eventDate <= thirtyDaysFromNow;
                 });
