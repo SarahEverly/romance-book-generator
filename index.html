@@ -22,7 +22,8 @@
       .scrolling-text-content {
         display: inline-block;
         padding-left: 100%;
-        animation: scroll-left 15s linear infinite;
+        /* The animation speed has been changed from 15s to 25s for a slower scroll */
+        animation: scroll-left 25s linear infinite;
       }
       @keyframes scroll-left {
         0% {
@@ -169,11 +170,11 @@
                 if (upcomingEvents.length > 0) {
                     // Create an array of HTML strings for each upcoming event
                     const eventHtmlArray = upcomingEvents.map(event => {
-                        return `✨ Upcoming Event: <a href="${event.eventLink}" target="_blank" rel="noopener noreferrer" class="underline">${event.eventTitle}</a>`;
+                        return `<a href="${event.eventLink}" target="_blank" rel="noopener noreferrer" class="underline">${event.eventTitle}</a>`;
                     });
 
                     // Join the HTML strings with a separator to create a single scrolling line
-                    eventBannerContent.innerHTML = eventHtmlArray.join(' &nbsp; &nbsp; &nbsp; ');
+                    eventBannerContent.innerHTML = `✨ Upcoming Events ✨ ${eventHtmlArray.join(' ✨ ')} ✨`;
                 } else {
                     eventBannerContent.innerHTML = `
                         <p>✨ Stay tuned for upcoming events! ✨</p>
@@ -188,58 +189,4 @@
                 download: true,
                 skipEmptyLines: true,
                 dynamicTyping: true,
-                complete: (results) => {
-                    loadingMessage.classList.add('hidden');
-                    if (results.errors.length > 0) {
-                        console.error("CSV Parsing Errors:", results.errors);
-                        displayError("Failed to parse the book list. Please check the file format.");
-                        return;
-                    }
-                    
-                    bookList = results.data.map(book => ({
-                        ...book,
-                        tropes: book.tropes ? String(book.tropes).split(',').map(t => t.trim()) : [],
-                        affiliateLink: book.affiliateLink || "https://www.amazon.com/kindle-dbs/hz/subscribe/ku/?ref_=dbs_f_kud_kd_ku_sub_romance_dbs_romance_p"
-                    }));
-                    
-                    if (bookList.length > 0) {
-                        displayRandomBook();
-                        if (bookList.length > 1) {
-                            buttonContainer.classList.remove('hidden');
-                        }
-                    } else {
-                        displayError("Book list is empty.");
-                    }
-                },
-                error: (err) => {
-                    console.error("CSV Fetch Error:", err);
-                    loadingMessage.classList.add('hidden');
-                    displayError("An error occurred while fetching the book list. Please make sure 'books.csv' is in your repository.");
-                },
-            });
-
-            // Parse the events.csv file for the banner
-            Papa.parse('events.csv', {
-                header: true,
-                download: true,
-                skipEmptyLines: true,
-                dynamicTyping: true,
-                complete: (results) => {
-                    if (results.errors.length === 0 && results.data.length > 0) {
-                        displayEventBanner(results.data);
-                    } else {
-                        console.warn("Could not load events.csv or file is empty.");
-                        displayEventBanner([]); // Display default message
-                    }
-                },
-                error: (err) => {
-                    console.warn("Error fetching events.csv:", err);
-                    displayEventBanner([]); // Display default message
-                }
-            });
-
-            generateButton.addEventListener('click', displayRandomBook);
-        });
-    </script>
-</body>
-</html>
+                complete: (resu
