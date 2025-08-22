@@ -158,10 +158,7 @@
 
                 // Filter for events in the next 30 days
                 const upcoming = events.filter(event => {
-                    // Use a more robust date parsing method to handle different formats
-                    const dateParts = event.eventDate.split('-');
-                    const eventDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-                    
+                    const eventDate = new Date(event.eventDate);
                     return eventDate >= now && eventDate <= thirtyDaysFromNow;
                 });
                 return upcoming;
@@ -170,11 +167,13 @@
             function displayEventBanner(events) {
                 const upcomingEvents = getUpcomingEvents(events);
                 if (upcomingEvents.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * upcomingEvents.length);
-                    const randomEvent = upcomingEvents[randomIndex];
-                    eventBannerContent.innerHTML = `
-                        ✨ Upcoming Event: <a href="${randomEvent.eventLink}" target="_blank" rel="noopener noreferrer" class="underline">${randomEvent.eventTitle}</a> ✨
-                    `;
+                    // Create an array of HTML strings for each upcoming event
+                    const eventHtmlArray = upcomingEvents.map(event => {
+                        return `✨ Upcoming Event: <a href="${event.eventLink}" target="_blank" rel="noopener noreferrer" class="underline">${event.eventTitle}</a>`;
+                    });
+
+                    // Join the HTML strings with a separator to create a single scrolling line
+                    eventBannerContent.innerHTML = eventHtmlArray.join(' &nbsp; &nbsp; &nbsp; ');
                 } else {
                     eventBannerContent.innerHTML = `
                         <p>✨ Stay tuned for upcoming events! ✨</p>
