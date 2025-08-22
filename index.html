@@ -38,12 +38,13 @@
 <body class="bg-pink-100 p-4">
     <div id="app" class="min-h-screen flex items-center justify-center">
         <div class="bg-white shadow-xl rounded-2xl p-8 max-w-xl w-full text-center transform transition-all duration-300">
-          <!-- Book News Banner (now scrolling and subtle) -->
-<div class="scrolling-text-container border-b-2 border-pink-200 mb-6 pb-2">
-    <div id="event-banner-content" class="scrolling-text-content text-pink-600 font-semibold text-sm">
-        ✨ Upcoming Book-ish Events ✨ <a href="#" class="underline">COMING SOON</a> ✨
-    </div>
-</div>
+            <!-- Book News Banner (now scrolling and subtle) -->
+            <div class="scrolling-text-container border-b-2 border-pink-200 mb-6 pb-2">
+                <div id="event-banner-content" class="scrolling-text-content text-pink-600 font-semibold text-sm">
+                    <!-- The event data will be dynamically injected here by the JavaScript -->
+                    ✨ Stay tuned for upcoming events! ✨
+                </div>
+            </div>
             
             <h1 class="text-4xl font-bold text-pink-600 mb-6 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart mr-2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
@@ -156,10 +157,14 @@
                 thirtyDaysFromNow.setDate(now.getDate() + 30);
 
                 // Filter for events in the next 30 days
-                return events.filter(event => {
-                    const eventDate = new Date(event.eventDate);
+                const upcoming = events.filter(event => {
+                    // Normalize date string for reliable parsing across browsers
+                    const dateParts = event.eventDate.split('/');
+                    const eventDate = new Date(`${dateParts[2]}-${dateParts[0]}-${dateParts[1]}`);
+                    
                     return eventDate >= now && eventDate <= thirtyDaysFromNow;
                 });
+                return upcoming;
             }
 
             function displayEventBanner(events) {
@@ -171,7 +176,9 @@
                         ✨ Upcoming Event: <a href="${randomEvent.eventLink}" target="_blank" rel="noopener noreferrer" class="underline">${randomEvent.eventTitle}</a> ✨
                     `;
                 } else {
-                    eventBannerContent.innerHTML = `<p>✨ Stay tuned for upcoming events! ✨</p>`;
+                    eventBannerContent.innerHTML = `
+                        <p>✨ Stay tuned for upcoming events! ✨</p>
+                    `;
                 }
             }
 
